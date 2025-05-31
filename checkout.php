@@ -12,7 +12,7 @@ if (isset($_POST['checkout'])) {
     $nama = $_POST['nama'];
     $email = $_POST['email'];
     $total = 0;
-    
+
     // Hitung total
     foreach ($_SESSION['cart'] as $menu_id => $quantity) {
         $query = "SELECT harga FROM menu WHERE id = $menu_id";
@@ -20,25 +20,25 @@ if (isset($_POST['checkout'])) {
         $menu = mysqli_fetch_assoc($result);
         $total += $menu['harga'] * $quantity;
     }
-    
+
     // Insert ke tabel pesanan
     $query = "INSERT INTO pesanan (nama_pelanggan, email, total_harga) VALUES ('$nama', '$email', $total)";
     mysqli_query($conn, $query);
     $pesanan_id = mysqli_insert_id($conn);
-    
+
     // Insert ke tabel detail_pesanan dan update stok
     foreach ($_SESSION['cart'] as $menu_id => $quantity) {
         $query = "INSERT INTO detail_pesanan (pesanan_id, menu_id, quantity) VALUES ($pesanan_id, $menu_id, $quantity)";
         mysqli_query($conn, $query);
-        
+
         // Update stok
         $query = "UPDATE menu SET stok = stok - $quantity WHERE id = $menu_id";
         mysqli_query($conn, $query);
     }
-    
+
     // Clear cart
     $_SESSION['cart'] = array();
-    
+
     // Redirect ke halaman sukses
     header("Location: checkout.php?success=1&id=$pesanan_id");
     exit();
@@ -47,12 +47,14 @@ if (isset($_POST['checkout'])) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Kantin Sekolah</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container py-5">
         <?php if (isset($_GET['success'])): ?>
@@ -61,8 +63,8 @@ if (isset($_POST['checkout'])) {
                     <div class="card">
                         <div class="card-body text-center">
                             <h2 class="mb-4">Pesanan Berhasil!</h2>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo $_GET['id']; ?>" 
-                                 alt="QR Code" class="mb-4">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo $_GET['id']; ?>"
+                                alt="QR Code" class="mb-4">
                             <h4>ID Pesanan: <?php echo $_GET['id']; ?></h4>
                             <p>Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.</p>
                             <a href="index.php" class="btn btn-primary">Kembali ke Beranda</a>
@@ -106,18 +108,26 @@ if (isset($_POST['checkout'])) {
                                                 $subtotal = $menu['harga'] * $quantity;
                                                 $total += $subtotal;
                                             ?>
-                                            <tr>
-                                                <td><?php echo $menu['nama_menu']; ?></td>
-                                                <td><?php echo $quantity; ?></td>
-                                                <td>Rp <?php echo number_format($menu['harga']); ?></td>
-                                                <td>Rp <?php echo number_format($subtotal); ?></td>
-                                            </tr>
+                                                <tr>
+                                                    <td><?php echo $menu['nama_menu']; ?></td>
+                                                    <td><?php echo $quantity; ?></td>
+                                                    <td>Rp <?php echo number_format($menu['harga']); ?></td>
+                                                    <td>Rp <?php echo number_format($subtotal); ?></td>
+                                                </tr>
                                             <?php endforeach; ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <td colspan="3" class="text-end"><strong>Total:</strong></td>
                                                 <td>Rp <?php echo number_format($total); ?></td>
+                                                <td>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="container d-flex justify-content-center align-items-center">
+                                                <img src="https://png.pngtree.com/png-clipart/20220729/original/pngtree-qr-code-png-image_8438558.png" alt="No" width="500">
+
+                                                </td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -133,4 +143,5 @@ if (isset($_POST['checkout'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+
+</html>

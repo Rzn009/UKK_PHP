@@ -11,7 +11,7 @@ if (!isset($_SESSION['cart'])) {
 if (isset($_POST['add_to_cart'])) {
     $menu_id = $_POST['menu_id'];
     $quantity = $_POST['quantity'];
-    
+
     if (isset($_SESSION['cart'][$menu_id])) {
         $_SESSION['cart'][$menu_id] += $quantity;
     } else {
@@ -26,12 +26,28 @@ $result_kantin = mysqli_query($conn, $query_kantin);
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kantin Sekolah</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .about-section {
+            background-color: #f8f9fa;
+        }
+
+        .about-section img {
+            transition: transform 0.3s ease;
+        }
+
+        .about-section img:hover {
+            transform: scale(1.02);
+        }
+    </style>
 </head>
+
 <body>
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -55,13 +71,33 @@ $result_kantin = mysqli_query($conn, $query_kantin);
     <section id="about" class="py-5">
         <div class="container">
             <h2 class="text-center mb-4">About Kantin</h2>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-md-6">
-                    <img src="kantin.jpg" class="img-fluid rounded" alt="Kantin">
+                    <div class="position-relative">
+                        <img src="https://i.ytimg.com/vi/3AWQnv6g9sk/maxresdefault.jpg"
+                            class="img-fluid rounded shadow-lg"
+                            alt="Kantin"
+                            style="width: 100%; height: 400px; object-fit: cover;">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-25 rounded"></div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <h3>Selamat Datang di Kantin Sekolah</h3>
-                    <p>Kantin sekolah kami menyediakan berbagai menu makanan dan minuman yang lezat dan sehat untuk para siswa.</p>
+                    <div class="p-4 bg-white rounded shadow-sm">
+                        <h3 class="mb-3">Selamat Datang di Kantin Sekolah</h3>
+                        <p class="lead mb-4">Kantin sekolah kami menyediakan berbagai menu makanan dan minuman yang lezat dan sehat untuk para siswa.</p>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-utensils me-2 text-primary"></i>
+                            <span>Menu bervariasi setiap hari</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-clock me-2 text-primary"></i>
+                            <span>Buka setiap hari Senin-Jumat</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-star me-2 text-primary"></i>
+                            <span>Kualitas terjamin</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,7 +105,7 @@ $result_kantin = mysqli_query($conn, $query_kantin);
 
     <!-- Menu List -->
     <section id="menu" class="py-5 bg-light">
-        <div class="container">
+        <div class="container" style="background-image: url('https://i.ytimg.com/vi/3AWQnv6g9sk/maxresdefault.jpg');">
             <h2 class="text-center mb-4">Cafetaria List</h2>
             <?php while ($kantin = mysqli_fetch_assoc($result_kantin)): ?>
                 <div class="card mb-4">
@@ -83,23 +119,23 @@ $result_kantin = mysqli_query($conn, $query_kantin);
                             $result_menu = mysqli_query($conn, $query_menu);
                             while ($menu = mysqli_fetch_assoc($result_menu)):
                             ?>
-                            <div class="col-md-4 mb-3">
-                                <div class="card">
-                                    <img src="<?php echo $menu['foto_menu']; ?>" class="card-img-top" alt="<?php echo $menu['nama_menu']; ?>">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><?php echo $menu['nama_menu']; ?></h5>
-                                        <p class="card-text">Rp <?php echo number_format($menu['harga']); ?></p>
-                                        <p class="card-text">Stok: <?php echo $menu['stok']; ?></p>
-                                        <form method="POST">
-                                            <input type="hidden" name="menu_id" value="<?php echo $menu['id']; ?>">
-                                            <div class="mb-2">
-                                                <input type="number" name="quantity" value="1" min="1" max="<?php echo $menu['stok']; ?>" class="form-control">
-                                            </div>
-                                            <button type="submit" name="add_to_cart" class="btn btn-primary">Tambah ke Keranjang</button>
-                                        </form>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="<?php echo $menu['foto_menu']; ?>" class="card-img-top" alt="<?php echo $menu['nama_menu']; ?>">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><?php echo $menu['nama_menu']; ?></h5>
+                                            <p class="card-text">Rp <?php echo number_format($menu['harga']); ?></p>
+                                            <p class="card-text">Stok: <?php echo $menu['stok']; ?></p>
+                                            <form method="POST">
+                                                <input type="hidden" name="menu_id" value="<?php echo $menu['id']; ?>">
+                                                <div class="mb-2">
+                                                    <input type="number" name="quantity" value="1" min="1" max="<?php echo $menu['stok']; ?>" class="form-control">
+                                                </div>
+                                                <button type="submit" name="add_to_cart" class="btn btn-primary">Tambah ke Keranjang</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             <?php endwhile; ?>
                         </div>
                     </div>
@@ -139,12 +175,12 @@ $result_kantin = mysqli_query($conn, $query_kantin);
                                             $subtotal = $menu['harga'] * $quantity;
                                             $total += $subtotal;
                                         ?>
-                                        <tr>
-                                            <td><?php echo $menu['nama_menu']; ?></td>
-                                            <td><?php echo $quantity; ?></td>
-                                            <td>Rp <?php echo number_format($menu['harga']); ?></td>
-                                            <td>Rp <?php echo number_format($subtotal); ?></td>
-                                        </tr>
+                                            <tr>
+                                                <td><?php echo $menu['nama_menu']; ?></td>
+                                                <td><?php echo $quantity; ?></td>
+                                                <td>Rp <?php echo number_format($menu['harga']); ?></td>
+                                                <td>Rp <?php echo number_format($subtotal); ?></td>
+                                            </tr>
                                         <?php endforeach; ?>
                                     </tbody>
                                     <tfoot>
@@ -198,4 +234,5 @@ $result_kantin = mysqli_query($conn, $query_kantin);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+
+</html>
