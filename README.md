@@ -1,147 +1,166 @@
 # Aplikasi Pemesanan Makanan Kantin Sekolah
 
 ## Deskripsi
-Aplikasi ini adalah sistem pemesanan makanan online untuk kantin sekolah yang memungkinkan siswa untuk memesan makanan dan minuman secara digital.
+Aplikasi ini adalah sistem pemesanan makanan online untuk kantin sekolah yang memungkinkan siswa untuk memesan makanan dan minuman secara digital. Aplikasi ini menggunakan PHP, MySQL, Bootstrap, dan SweetAlert2 untuk memberikan pengalaman pengguna yang baik.
 
 ## Struktur Database
 Database menggunakan MySQL dengan nama `db_kantin` yang terdiri dari beberapa tabel:
 
-1. `kantin` - Menyimpan data kantin
-   - id (Primary Key)
-   - nama_kantin
-   - foto_kantin
-   - deskripsi
+### 1. Tabel `kantin`
+- `id` (INT, Primary Key, Auto Increment)
+- `nama_kantin` (VARCHAR(100), NOT NULL)
+- `foto_kantin` (VARCHAR(255))
+- `deskripsi` (TEXT)
 
-2. `menu` - Menyimpan data menu makanan/minuman
-   - id (Primary Key)
-   - kantin_id (Foreign Key)
-   - nama_menu
-   - harga
-   - stok
-   - foto_menu
+### 2. Tabel `menu`
+- `id` (INT, Primary Key, Auto Increment)
+- `kantin_id` (INT, Foreign Key ke tabel kantin)
+- `nama_menu` (VARCHAR(100), NOT NULL)
+- `harga` (DECIMAL(10,2), NOT NULL)
+- `stok` (INT, NOT NULL, DEFAULT 0)
+- `foto_menu` (VARCHAR(255))
 
-3. `pesanan` - Menyimpan data pesanan
-   - id (Primary Key)
-   - nama_pelanggan
-   - email
-   - total_harga
-   - tanggal_pesanan
+### 3. Tabel `pesanan`
+- `id` (INT, Primary Key, Auto Increment)
+- `nama_pelanggan` (VARCHAR(100), NOT NULL)
+- `email` (VARCHAR(100), NOT NULL)
+- `total_harga` (DECIMAL(10,2), NOT NULL)
+- `tanggal_pesanan` (DATETIME, DEFAULT CURRENT_TIMESTAMP)
 
-4. `detail_pesanan` - Menyimpan detail item pesanan
-   - id (Primary Key)
-   - pesanan_id (Foreign Key)
-   - menu_id (Foreign Key)
-   - quantity
+### 4. Tabel `detail_pesanan`
+- `id` (INT, Primary Key, Auto Increment)
+- `pesanan_id` (INT, Foreign Key ke tabel pesanan)
+- `menu_id` (INT, Foreign Key ke tabel menu)
+- `quantity` (INT, NOT NULL)
+
+## Relasi Database
+1. `kantin` 1:N `menu` - Satu kantin dapat memiliki banyak menu
+2. `pesanan` 1:N `detail_pesanan` - Satu pesanan dapat memiliki banyak detail pesanan
+3. `menu` 1:N `detail_pesanan` - Satu menu dapat muncul di banyak detail pesanan
 
 ## Alur Kerja Aplikasi
 
 ### 1. Halaman Utama (index.php)
-- Menampilkan navigasi dengan menu: About Kantin, Cafetaria List, How to Buy, Contact Us
-- Bagian About Kantin menampilkan informasi dan gambar kantin
-- Bagian Cafetaria List menampilkan daftar kantin beserta menu-menu mereka
-- Setiap menu memiliki tombol untuk menambahkan ke keranjang
-- Bagian How to Buy menampilkan keranjang belanja dengan total harga
-- Bagian Contact Us berisi form untuk mengirim pesan/kritik
+- **Tampilan Awal**:
+  - Menampilkan navigasi dengan menu: About Kantin, Cafetaria List, How to Buy, Contact Us
+  - Bagian About Kantin menampilkan informasi dan gambar kantin
+  - Bagian Cafetaria List menampilkan daftar kantin beserta menu-menu mereka
 
-### 2. Proses Pemesanan
-1. User memilih menu dan jumlah yang diinginkan
-2. Menu ditambahkan ke keranjang (disimpan dalam session)
-3. User dapat melihat ringkasan pesanan di keranjang
-4. User melakukan checkout dengan mengisi nama dan email
-5. Sistem memproses pesanan:
-   - Menyimpan data pesanan ke database
-   - Mengurangi stok menu yang dipesan
-   - Menghasilkan QR Code untuk pengambilan pesanan
+- **Proses Menambah ke Keranjang**:
+  ```php
+  if (isset($_POST['add_to_cart'])) {
+      $menu_id = $_POST['menu_id'];
+      $quantity = $_POST['quantity'];
+      
+      if (isset($_SESSION['cart'][$menu_id])) {
+          $_SESSION['cart'][$menu_id] += $quantity;
+      } else {
+          $_SESSION['cart'][$menu_id] = $quantity;
+      }
+  }
+  ```
+  - Data keranjang disimpan dalam session PHP
+  - Jika menu sudah ada di keranjang, quantity akan ditambahkan
+  - Jika menu belum ada, akan ditambahkan sebagai item baru
 
-### 3. Halaman Checkout (checkout.php)
-- Menampilkan form untuk data pelanggan
-- Menampilkan ringkasan pesanan dan total harga
-- Setelah pembayaran berhasil, menampilkan QR Code
-- QR Code digunakan untuk pengambilan pesanan di kantin
+### 2. Proses Checkout (checkout.php)
+- **Form Checkout**:
+  - User mengisi nama dan email
+  - Menampilkan ringkasan pesanan dan total harga
+  - Menampilkan QR Code untuk pembayaran
 
-## Penjelasan Kode
+- **Proses Pembayaran**:
+  ```php
+  if (isset($_POST['checkout'])) {
+      // Hitung total
+      foreach ($_SESSION['cart'] as $menu_id => $quantity) {
+          $query = "SELECT harga FROM menu WHERE id = $menu_id";
+          $result = mysqli_query($conn, $query);
+          $menu = mysqli_fetch_assoc($result);
+          $total += $menu['harga'] * $quantity;
+      }
+      
+      // Simpan pesanan
+      $query = "INSERT INTO pesanan (nama_pelanggan, email, total_harga) 
+                VALUES ('$nama', '$email', $total)";
+      mysqli_query($conn, $query);
+      $pesanan_id = mysqli_insert_id($conn);
+      
+      // Simpan detail pesanan dan update stok
+      foreach ($_SESSION['cart'] as $menu_id => $quantity) {
+          // Insert detail pesanan
+          $query = "INSERT INTO detail_pesanan (pesanan_id, menu_id, quantity) 
+                    VALUES ($pesanan_id, $menu_id, $quantity)";
+          mysqli_query($conn, $query);
+          
+          // Update stok
+          $query = "UPDATE menu SET stok = stok - $quantity WHERE id = $menu_id";
+          mysqli_query($conn, $query);
+      }
+  }
+  ```
 
-### 1. Koneksi Database (config.php)
-```php
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "db_kantin";
+- **Notifikasi Sukses**:
+  ```javascript
+  Swal.fire({
+      title: 'Pembayaran Berhasil!',
+      text: 'Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.',
+      icon: 'success',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#28a745'
+  });
+  ```
 
-$conn = mysqli_connect($host, $username, $password, $database);
-```
-File ini menangani koneksi ke database MySQL.
+### 3. Fitur Keamanan
+1. **Validasi Input**:
+   - Form menggunakan atribut `required` untuk memastikan data terisi
+   - Validasi email menggunakan type="email"
+   - Sanitasi data sebelum disimpan ke database
 
-### 2. Manajemen Keranjang (index.php)
-```php
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = array();
-}
+2. **Manajemen Session**:
+   - Pengecekan session untuk keranjang belanja
+   - Redirect ke halaman utama jika keranjang kosong
 
-if (isset($_POST['add_to_cart'])) {
-    $menu_id = $_POST['menu_id'];
-    $quantity = $_POST['quantity'];
-    
-    if (isset($_SESSION['cart'][$menu_id])) {
-        $_SESSION['cart'][$menu_id] += $quantity;
-    } else {
-        $_SESSION['cart'][$menu_id] = $quantity;
-    }
-}
-```
-Kode ini mengelola keranjang belanja menggunakan session PHP.
-
-### 3. Proses Checkout (checkout.php)
-```php
-if (isset($_POST['checkout'])) {
-    // Hitung total
-    foreach ($_SESSION['cart'] as $menu_id => $quantity) {
-        $query = "SELECT harga FROM menu WHERE id = $menu_id";
-        $result = mysqli_query($conn, $query);
-        $menu = mysqli_fetch_assoc($result);
-        $total += $menu['harga'] * $quantity;
-    }
-    
-    // Simpan pesanan
-    $query = "INSERT INTO pesanan (nama_pelanggan, email, total_harga) VALUES ('$nama', '$email', $total)";
-    mysqli_query($conn, $query);
-    
-    // Update stok
-    foreach ($_SESSION['cart'] as $menu_id => $quantity) {
-        $query = "UPDATE menu SET stok = stok - $quantity WHERE id = $menu_id";
-        mysqli_query($conn, $query);
-    }
-}
-```
-Kode ini menangani proses checkout, termasuk:
-- Perhitungan total harga
-- Penyimpanan data pesanan
-- Update stok menu
+3. **Pengecekan Stok**:
+   - Validasi stok sebelum pemesanan
+   - Update stok otomatis setelah pembayaran
 
 ## Cara Menjalankan Aplikasi
 
-1. Import database:
-   - Buat database baru dengan nama `db_kantin`
-   - Import file `database.sql`
+1. **Persiapan Database**:
+   ```sql
+   CREATE DATABASE db_kantin;
+   USE db_kantin;
+   ```
+   - Import file `database.sql` untuk membuat struktur tabel dan data awal
 
-2. Konfigurasi:
-   - Sesuaikan pengaturan database di `config.php`
+2. **Konfigurasi**:
+   - Sesuaikan pengaturan database di `config.php`:
+     ```php
+     $host = "localhost";
+     $username = "root";
+     $password = "";
+     $database = "db_kantin";
+     ```
+
+3. **Menjalankan Aplikasi**:
    - Pastikan web server (Apache) dan MySQL berjalan
-
-3. Akses aplikasi:
-   - Buka browser
-   - Akses `http://localhost/nama_folder`
-
-## Fitur Keamanan
-- Validasi input form
-- Sanitasi data sebelum disimpan ke database
-- Pengecekan stok sebelum pemesanan
-- Session management untuk keranjang belanja
+   - Akses aplikasi melalui browser: `http://localhost/nama_folder`
 
 ## Teknologi yang Digunakan
 - PHP 7.4+
 - MySQL
 - Bootstrap 5
+- SweetAlert2
 - HTML5
 - CSS3
-- JavaScript 
+- JavaScript
+
+## Fitur Utama
+1. Pemesanan makanan online
+2. Manajemen keranjang belanja
+3. Sistem pembayaran dengan QR Code
+4. Notifikasi pembayaran berhasil
+5. Manajemen stok otomatis
+6. Tampilan responsif
+7. Form kontak untuk feedback 
