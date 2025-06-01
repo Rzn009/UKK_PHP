@@ -66,19 +66,32 @@ if (isset($_POST['checkout'])) {
                     text: 'Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.',
                     icon: 'success',
                     confirmButtonText: 'OK',
-                    confirmButtonColor: '#28a745'
+                    confirmButtonColor: '#28a745',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Tampilkan QR Code setelah alert ditutup
+                        document.getElementById('success-content').style.display = 'block';
+                    }
                 });
             </script>
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <h2 class="mb-4">Pesanan Berhasil!</h2>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo $_GET['id']; ?>"
-                                alt="QR Code" class="mb-4">
-                            <h4>ID Pesanan: <?php echo $_GET['id']; ?></h4>
-                            <p>Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.</p>
-                            <a href="index.php" class="btn btn-primary">Kembali ke Beranda</a>
+            <div id="success-content" style="display: none;">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h2 class="mb-4">Pesanan Berhasil!</h2>
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo $_GET['id']; ?>"
+                                    alt="QR Code" class="mb-4">
+                                <h4>ID Pesanan: <?php echo $_GET['id']; ?></h4>
+                                <p>Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.</p>
+                                <a href="index.php" class="btn btn-primary">Kembali ke Beranda</a>
+                            </div>
                         </div>
                     </div>
                 </div>

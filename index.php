@@ -1,11 +1,12 @@
 <?php
-require_once 'config.php';
+include  'config.php';
 session_start();
 
 // Inisialisasi keranjang jika belum ada
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
 }
+
 
 // Proses tambah ke keranjang
 if (isset($_POST['add_to_cart'])) {
@@ -73,44 +74,34 @@ $result_kantin = mysqli_query($conn, $query_kantin);
             <h2 class="text-center mb-4">About Kantin</h2>
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <div class="position-relative">
-                        <img src="https://i.ytimg.com/vi/3AWQnv6g9sk/maxresdefault.jpg"
-                            class="img-fluid rounded shadow-lg"
-                            alt="Kantin"
-                            style="width: 100%; height: 400px; object-fit: cover;">
-                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-25 rounded"></div>
-                    </div>
+                    <img src="https://i.ytimg.com/vi/3AWQnv6g9sk/maxresdefault.jpg"
+                        class="img-fluid rounded shadow-lg"
+                        alt="Kantin">
                 </div>
                 <div class="col-md-6">
-                    <div class="p-4 bg-white rounded shadow-sm">
-                        <h3 class="mb-3">Selamat Datang di Kantin Sekolah</h3>
-                        <p class="lead mb-4">Kantin sekolah kami menyediakan berbagai menu makanan dan minuman yang lezat dan sehat untuk para siswa.</p>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-utensils me-2 text-primary"></i>
-                            <span>Menu bervariasi setiap hari</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-clock me-2 text-primary"></i>
-                            <span>Buka setiap hari Senin-Jumat</span>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-star me-2 text-primary"></i>
-                            <span>Kualitas terjamin</span>
-                        </div>
-                    </div>
+                    <p>Kantin sekolah kami menyediakan berbagai menu makanan dan minuman yang lezat dan sehat untuk para siswa.</p>
                 </div>
             </div>
+
+        </div>
         </div>
     </section>
 
+    <!-- Vidio -->
+    <div class="container d-flex justify-content-center">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/3AWQnv6g9sk?si=L35fxmTgj-IIs4_H" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+    </div>
+    <!-- vidio -->
     <!-- Menu List -->
     <section id="menu" class="py-5 bg-light">
-        <div class="container" style="background-image: url('https://i.ytimg.com/vi/3AWQnv6g9sk/maxresdefault.jpg');">
+        <div class="container" >
             <h2 class="text-center mb-4">Cafetaria List</h2>
             <?php while ($kantin = mysqli_fetch_assoc($result_kantin)): ?>
                 <div class="card mb-4">
                     <div class="card-header">
                         <h3><?php echo $kantin['nama_kantin']; ?></h3>
+                        <p><?php echo $kantin['deskripsi']; ?></p>
                     </div>
                     <div class="card-body">
                         <div class="row">
