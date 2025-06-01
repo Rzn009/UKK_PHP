@@ -39,8 +39,8 @@ if (isset($_POST['checkout'])) {
     // Clear cart
     $_SESSION['cart'] = array();
 
-    // Redirect ke halaman sukses
-    header("Location: checkout.php?success=1&id=$pesanan_id");
+    // Redirect ke halaman utama dengan parameter success
+    header("Location: index.php?success=1");
     exit();
 }
 ?>
@@ -59,27 +59,7 @@ if (isset($_POST['checkout'])) {
 <body>
     <div class="container py-5">
         <?php if (isset($_GET['success'])): ?>
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-            <script>
-                Swal.fire({
-                    title: 'Pembayaran Berhasil!',
-                    text: 'Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.',
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#28a745',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Tampilkan QR Code setelah alert ditutup
-                        document.getElementById('success-content').style.display = 'block';
-                    }
-                });
-            </script>
+            kosong
             <div id="success-content" style="display: none;">
                 <div class="row justify-content-center">
                     <div class="col-md-8">

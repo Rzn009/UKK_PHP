@@ -34,6 +34,7 @@ $result_kantin = mysqli_query($conn, $query_kantin);
     <title>Kantin Sekolah</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .about-section {
             background-color: #f8f9fa;
@@ -50,6 +51,25 @@ $result_kantin = mysqli_query($conn, $query_kantin);
 </head>
 
 <body>
+    <?php if (isset($_GET['success'])): ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        Swal.fire({
+            title: 'Pembayaran Berhasil!',
+            text: 'Silahkan tunjukkan QR Code ini ke kasir untuk mengambil pesanan Anda.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#28a745',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+    </script>
+    <?php endif; ?>
+
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
