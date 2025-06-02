@@ -3,6 +3,73 @@
 ## Deskripsi
 Aplikasi ini adalah sistem pemesanan makanan online untuk kantin sekolah yang memungkinkan siswa untuk memesan makanan dan minuman secara digital. Aplikasi ini menggunakan PHP, MySQL, Bootstrap, dan SweetAlert2 untuk memberikan pengalaman pengguna yang baik.
 
+## Flowchart Aplikasi
+
+```mermaid
+graph TD
+    A[User] --> B[Halaman Utama]
+    B --> C{Menu Navigasi}
+    C -->|About Kantin| D[Tampilkan Info Kantin]
+    C -->|Cafetaria List| E[Tampilkan Daftar Menu]
+    C -->|How to Buy| F[Tampilkan Keranjang]
+    C -->|Contact Us| G[Form Kontak]
+    
+    E --> H{Tambah ke Keranjang}
+    H -->|Ya| I[Update Session Cart]
+    H -->|Tidak| E
+    
+    F --> J{Keranjang Kosong?}
+    J -->|Ya| K[Tampilkan Pesan Kosong]
+    J -->|Tidak| L[Tampilkan Item & Total]
+    
+    L --> M{Checkout?}
+    M -->|Ya| N[Halaman Checkout]
+    M -->|Tidak| F
+    
+    N --> O[Form Data Pelanggan]
+    O --> P{Proses Pembayaran}
+    P -->|Berhasil| Q[Alert Sukses]
+    P -->|Gagal| N
+    
+    Q --> R[Kembali ke Beranda]
+    R --> B
+    
+    G --> S[Kirim Pesan]
+    S --> T[Process Contact]
+    T --> B
+```
+
+## Penjelasan Flowchart
+
+1. **Halaman Utama**
+   - User masuk ke halaman utama
+   - Tersedia 4 menu navigasi: About Kantin, Cafetaria List, How to Buy, Contact Us
+
+2. **Proses Pemesanan**
+   - User memilih menu dari Cafetaria List
+   - User dapat menambah menu ke keranjang
+   - Data keranjang disimpan dalam session
+
+3. **Keranjang Belanja**
+   - User dapat melihat isi keranjang di menu How to Buy
+   - Jika keranjang kosong, tampilkan pesan
+   - Jika ada item, tampilkan daftar item dan total
+
+4. **Proses Checkout**
+   - User mengisi data pelanggan
+   - Sistem memproses pembayaran
+   - Jika berhasil, tampilkan alert sukses
+   - Jika gagal, kembali ke form checkout
+
+5. **Notifikasi**
+   - Setelah pembayaran berhasil, tampilkan alert
+   - User diarahkan kembali ke halaman utama
+
+6. **Form Kontak**
+   - User dapat mengirim pesan/kritik
+   - Data dikirim ke process_contact.php
+   - Setelah berhasil, kembali ke halaman utama
+
 ## Struktur Database
 Database menggunakan MySQL dengan nama `db_kantin` yang terdiri dari beberapa tabel:
 
